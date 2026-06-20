@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { typeColor, daysSince } from '../../../lib/utils';
+import { generateIllustration } from '../../../lib/illustration';
 
 export default function PlantDetailPage() {
   const { id } = useParams();
@@ -59,6 +60,13 @@ export default function PlantDetailPage() {
   const daysAgo = lastWatered ? daysSince(lastWatered) : null;
   const overdue = daysAgo !== null && daysAgo >= (plant.watering_interval_days || 7);
 
+  const illustration = plant.photo_url
+    || generateIllustration(plant.type, plant.illustration_seed || plant.genus);
+
+  const dexNumber = plant.species_id
+    ? String(plant.species_id).padStart(3, '0')
+    : '???';
+
   return (
     <div>
       <a href="/" className="back-link">&larr; Back to Pokedex</a>
@@ -67,10 +75,11 @@ export default function PlantDetailPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="detail-photo"
-          src={plant.photo_url || '/placeholder-plant.svg'}
+          src={illustration}
           alt={plant.nickname}
         />
         <div>
+          <div className="card-id">#{dexNumber}</div>
           <h1 style={{ margin: '0 0 4px' }}>{plant.nickname}</h1>
           <p style={{ margin: '0 0 8px', color: '#666' }}>
             <em>{plant.genus} {plant.species}</em>

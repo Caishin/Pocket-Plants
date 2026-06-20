@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { typeColor, daysSince } from '../lib/utils';
+import { generateIllustration } from '../lib/illustration';
 
 export default function PlantCard({ plant }) {
   const last = plant.lastWatered;
@@ -9,15 +10,22 @@ export default function PlantCard({ plant }) {
   const interval = plant.watering_interval_days || 7;
   const overdue = daysAgo !== null && daysAgo >= interval;
 
+  const illustration = plant.photo_url
+    || generateIllustration(plant.type, plant.illustration_seed || plant.genus);
+
+  const dexNumber = plant.species_id
+    ? String(plant.species_id).padStart(3, '0')
+    : '???';
+
   return (
     <Link href={`/plants/${plant.id}`} className="card">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="card-photo"
-        src={plant.photo_url || '/placeholder-plant.svg'}
+        src={illustration}
         alt={plant.nickname}
       />
-      <div className="card-id">#{plant.short_id}</div>
+      <div className="card-id">#{dexNumber}</div>
       <div className="card-name">{plant.nickname}</div>
       <span className="type-badge" style={{ background: typeColor(plant.type) }}>
         {plant.type}
